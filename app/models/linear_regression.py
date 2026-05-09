@@ -10,7 +10,22 @@ class LinearRegression():
         self.weights = None
         self.bias = None
 
+        self.mean = None
+        self.std = None
+
         self.cost_history = []
+
+    def normalize_features(self, X):
+
+        if self.mean is None:
+            self.mean = np.mean(X, axis=0)
+
+        if self.std is None:
+            self.std = np.std(X, axis=0)
+
+        X_normalized = (X - self.mean) / self.std
+
+        return X_normalized
     
     def initialize_parameters(self, n_features):
         self.weights = np.zeros(n_features)
@@ -18,7 +33,10 @@ class LinearRegression():
 
     def predict(self, x):
 
+
+        x = (x - self.mean) / self.std
         predictions = np.dot(x ,self.weights) + self.bias
+        
 
         return predictions
     
@@ -26,9 +44,13 @@ class LinearRegression():
         n_sample = len(y_true)
 
         cost = (1/n_sample) * np.sum((y_pred - y_true) ** 2)
+
+        return cost
     
     def fit(self, X,y):
         n_samples, n_features = X.shape
+
+        X = self.normalize_features(X)
 
         self.initialize_parameters(n_features)
 
@@ -46,5 +68,5 @@ class LinearRegression():
 
             self.cost_history.append(cost)
 
-            if i % 100 == 0:
+            if i % 1000 == 0:
                 print(f"Iteration {i}, Cost: {cost}")
